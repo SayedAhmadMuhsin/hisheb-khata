@@ -46,7 +46,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
     await signInWithEmailAndPassword(auth, email, password);
     window.location.href = "index.html";
   } catch(e){
-    errEl.textContent = "ভুল ইমেইল বা পাসওয়ার্ড";
+    eerrEl.textContent = e.code + " — " + e.message;
   }
 });
 </script>
