@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>ঋণের হিসাব — হিসাব খাতা</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div>
+    <span class="eyebrow">হিসাব খাতা</span>
+    <h1>ঋণের হিসাব</h1>
+  </div>
+</div>
+
+<div class="page">
+  <div class="stat-row">
+    <div class="stat-card due">
+      <div class="label">মোট বকেয়া ঋণ</div>
+      <div class="value taka" id="totalLoanDue">০</div>
+    </div>
+    <div class="stat-card profit">
+      <div class="label">মোট আদায়</div>
+      <div class="value taka" id="totalLoanPaid">০</div>
+    </div>
+  </div>
+
+  <div class="section-head"><h2>তালিকা</h2></div>
+  <div class="list" id="loanList">
+    <div class="empty"><span class="glyph">🤝</span>এখনও কোনো ঋণের হিসাব নেই</div>
+  </div>
+</div>
+
+<button class="fab" id="openNewLoan">+</button>
+
+<div class="sheet-overlay" id="loanOverlay">
+  <div class="sheet">
+    <button class="close-x" id="closeLoan">✕</button>
+    <h3>নতুন ঋণ যোগ করুন</h3>
+    <div class="field">
+      <label>ব্যক্তির নাম</label>
+      <input type="text" id="lName" placeholder="যেমনঃ করিম ভাই">
+    </div>
+    <div class="field mono">
+      <label>পরিমাণ (৳)</label>
+      <input type="number" id="lAmount" placeholder="0" inputmode="decimal">
+    </div>
+    <div class="field">
+      <label>বিস্তারিত নোট</label>
+      <textarea id="lNote" rows="3" placeholder="কবে দিয়েছি, কী কারণে, কবে ফেরত দেবে ইত্যাদি"></textarea>
+    </div>
+    <button class="btn btn-primary" id="saveLoan">যোগ করুন</button>
+  </div>
+</div>
+
+<div class="tabbar">
+  <a href="index.html"><span class="ic">🏠</span>হোম</a>
+  <a href="folders.html"><span class="ic">📁</span>হিসাব-কিতাব</a>
+  <a href="loans.html" class="active"><span class="ic">🤝</span>ঋণের হিসাব</a>
+</div>
+
+<script type="module" src="js/loans.js"></script>
+</body>
+</html>
