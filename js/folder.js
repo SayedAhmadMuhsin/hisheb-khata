@@ -44,6 +44,7 @@ function populateCategorySelect(cats){
   sel.innerHTML = cats.map(c => `<option value="${c.id}" data-name="${escapeAttr(c.name)}">${escapeAttr(c.name)}</option>`).join("")
     + `<option value="__new__">+ নতুন ক্যাটেগরি যোগ করুন</option>`;
   if ([...sel.options].some(o => o.value === current)) sel.value = current;
+  document.getElementById("newCatField").classList.toggle("hidden", sel.value !== "__new__");
 }
 document.getElementById("catSelect").addEventListener("change", (e) => {
   document.getElementById("newCatField").classList.toggle("hidden", e.target.value !== "__new__");
