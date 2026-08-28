@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>হিসাব-কিতাব — হিসাব খাতা</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div>
+    <span class="eyebrow">হিসাব খাতা</span>
+    <h1>হিসাব-কিতাব</h1>
+  </div>
+</div>
+
+<div class="page">
+  <div class="section-head">
+    <h2>কাস্টমার ফোল্ডার</h2>
+  </div>
+  <div class="list" id="folderList">
+    <div class="empty"><span class="glyph">📁</span>এখনও কোনো ফোল্ডার নেই<br>নিচের + বাটনে চাপুন</div>
+  </div>
+</div>
+
+<button class="fab" id="openNewFolder">+</button>
+
+<!-- New folder sheet -->
+<div class="sheet-overlay" id="folderOverlay">
+  <div class="sheet">
+    <button class="close-x" id="closeFolder">✕</button>
+    <h3>নতুন ফোল্ডার</h3>
+    <div class="field">
+      <label>কাস্টমারের নাম</label>
+      <input type="text" id="fName" placeholder="যেমনঃ রহিম ভাই">
+    </div>
+    <div class="field">
+      <label>ফোন / নোট (ঐচ্ছিক)</label>
+      <input type="text" id="fNote" placeholder="ফোন নম্বর বা কোনো নোট">
+    </div>
+    <button class="btn btn-primary" id="createFolder">ফোল্ডার তৈরি করুন</button>
+  </div>
+</div>
+
+<div class="tabbar">
+  <a href="index.html"><span class="ic">🏠</span>হোম</a>
+  <a href="folders.html" class="active"><span class="ic">📁</span>হিসাব-কিতাব</a>
+  <a href="loans.html"><span class="ic">🤝</span>ঋণের হিসাব</a>
+</div>
+
+<script type="module" src="js/folders.js"></script>
+</body>
+</html>

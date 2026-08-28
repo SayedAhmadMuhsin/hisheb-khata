@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>হোম — হিসাব খাতা</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div>
+    <span class="eyebrow">হিসাব খাতা</span>
+    <h1>হোম</h1>
+  </div>
+  <button class="btn-ghost" id="logoutBtn">লগআউট</button>
+</div>
+
+<div class="page">
+
+  <div class="balance-hero">
+    <div class="label">মূল ব্যালেন্স</div>
+    <div class="amount taka" id="mainBalance">০</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card due">
+      <div class="label">মোট বকেয়া (পাই)</div>
+      <div class="value taka" id="totalDue">০</div>
+    </div>
+    <div class="stat-card profit">
+      <div class="label">এই মাসের লাভ</div>
+      <div class="value taka" id="monthProfit">০</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-outline" id="openWithdraw">➖ গ্রহণ / উত্তোলন</button>
+  </div>
+
+  <div class="section-head">
+    <h2>সাম্প্রতিক কার্যক্রম</h2>
+  </div>
+  <div class="list" id="txList">
+    <div class="empty"><span class="glyph">📖</span>এখনও কোনো লেনদেন নেই</div>
+  </div>
+
+</div>
+
+<!-- Withdraw sheet -->
+<div class="sheet-overlay" id="withdrawOverlay">
+  <div class="sheet">
+    <button class="close-x" id="closeWithdraw">✕</button>
+    <h3>গ্রহণ / উত্তোলন</h3>
+    <div class="field">
+      <label>বাবদ (কী জন্য নিচ্ছেন)</label>
+      <input type="text" id="wNote" placeholder="যেমনঃ দোকান খরচ, ব্যক্তিগত খরচ">
+    </div>
+    <div class="field mono">
+      <label>পরিমাণ (৳)</label>
+      <input type="number" id="wAmount" placeholder="0" inputmode="decimal">
+    </div>
+    <button class="btn btn-primary" id="confirmWithdraw">নিশ্চিত করুন — ব্যালেন্স থেকে কর্তন হবে</button>
+  </div>
+</div>
+
+<div class="tabbar">
+  <a href="index.html" class="active"><span class="ic">🏠</span>হোম</a>
+  <a href="folders.html"><span class="ic">📁</span>হিসাব-কিতাব</a>
+  <a href="loans.html"><span class="ic">🤝</span>ঋণের হিসাব</a>
+</div>
+
+<script type="module" src="js/home.js"></script>
+</body>
+</html>

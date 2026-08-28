@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>ফোল্ডার — হিসাব খাতা</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div>
+    <a href="folders.html" class="back-link">← ফিরে যান</a>
+    <h1 id="folderName" style="margin-top:4px">…</h1>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="label">মোট লাভ (এই ফোল্ডার)</div>
+      <div class="value taka" id="folderTotalProfit">০</div>
+    </div>
+    <div class="stat-card due">
+      <div class="label">বকেয়া (অপরিশোধিত)</div>
+      <div class="value taka" id="folderUnpaid">০</div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <h2>প্রোডাক্ট / ক্যাটেগরি</h2>
+  </div>
+
+  <div id="itemList">
+    <div class="empty"><span class="glyph">🧾</span>এখনও কোনো প্রোডাক্ট যোগ করা হয়নি</div>
+  </div>
+
+</div>
+
+<button class="fab" id="openNewItem">+</button>
+
+<!-- New item sheet -->
+<div class="sheet-overlay" id="itemOverlay">
+  <div class="sheet">
+    <button class="close-x" id="closeItem">✕</button>
+    <h3>নতুন প্রোডাক্ট যোগ করুন</h3>
+
+    <div class="field">
+      <label>ক্যাটেগরি</label>
+      <select id="catSelect">
+        <option value="__new__">+ নতুন ক্যাটেগরি যোগ করুন</option>
+      </select>
+    </div>
+    <div class="field hidden" id="newCatField">
+      <label>নতুন ক্যাটেগরির নাম</label>
+      <input type="text" id="newCatName" placeholder="যেমনঃ চাবির রিং">
+    </div>
+
+    <div class="field mono">
+      <label>পরিমাণ (পিছ)</label>
+      <input type="number" id="iQty" placeholder="0" inputmode="decimal">
+    </div>
+    <div class="field mono">
+      <label>মূল রেট — প্রতি পিছ খরচ (৳)</label>
+      <input type="number" id="iCostRate" placeholder="0" inputmode="decimal">
+    </div>
+    <div class="field mono">
+      <label>কাস্টমার রেট — প্রতি পিছ (৳)</label>
+      <input type="number" id="iSaleRate" placeholder="0" inputmode="decimal">
+    </div>
+
+    <div class="calc-grid" style="margin: 4px 0 16px">
+      <div class="k">মোট খরচ</div><div class="v taka" id="previewCost">০</div>
+      <div class="k">মোট বিক্রয়</div><div class="v taka" id="previewSale">০</div>
+      <div class="k">লাভ</div><div class="v taka" id="previewProfit" style="color:var(--profit-green)">০</div>
+    </div>
+
+    <button class="btn btn-primary" id="saveItem">যোগ করুন</button>
+  </div>
+</div>
+
+<script type="module" src="js/folder.js"></script>
+</body>
+</html>

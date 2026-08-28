@@ -1,0 +1,392 @@
+/* ============================================================
+   হিসাব খাতা — Design tokens
+   Concept: a real Bengali business ledger (bahi khata) — aged
+   paper, a red margin rule down the left edge, faint horizontal
+   ruling, ink-blue/red numerals like a shopkeeper's handwriting.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Tiro+Bangla:ital@0;1&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --paper: #F5EFDC;
+  --paper-line: #E3D9BD;
+  --ledger-red: #A02334;
+  --ledger-red-dim: #C86B78;
+  --ink: #23241F;
+  --ink-soft: #55564C;
+  --ink-blue: #2B3A55;
+  --brass: #A8823C;
+  --profit-green: #3F6C51;
+  --card: #FBF8EE;
+  --shadow: 0 2px 10px rgba(35,36,31,0.08);
+
+  --font-display: 'Tiro Bangla', serif;
+  --font-body: 'Hind Siliguri', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius: 10px;
+  --margin-rule: 46px;
+}
+
+*{ box-sizing: border-box; }
+
+html,body{
+  margin:0; padding:0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body{
+  min-height:100vh;
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 37px,
+      var(--paper-line) 38px
+    );
+  background-position: 0 92px;
+  padding-left: var(--margin-rule);
+  position: relative;
+}
+
+body::before{
+  content:"";
+  position: fixed;
+  top:0; bottom:0; left: var(--margin-rule);
+  width: 2px;
+  background: var(--ledger-red-dim);
+  opacity:.55;
+  z-index: 1;
+}
+
+a{ color: inherit; text-decoration:none; }
+button{ font-family: inherit; }
+
+/* ---------- Top bar ---------- */
+.topbar{
+  position: sticky; top:0; z-index: 20;
+  background: var(--paper);
+  padding: 18px 16px 14px 14px;
+  display:flex; align-items:baseline; justify-content:space-between;
+  border-bottom: 1px solid var(--paper-line);
+}
+.topbar h1{
+  font-family: var(--font-display);
+  font-size: 22px;
+  margin:0;
+  color: var(--ledger-red);
+  letter-spacing:.2px;
+}
+.topbar .eyebrow{
+  display:block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 1.5px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.back-link{
+  font-size: 14px;
+  color: var(--ink-blue);
+  font-weight: 600;
+}
+
+/* ---------- Layout ---------- */
+.page{
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 14px 14px 90px 10px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ---------- Balance hero ---------- */
+.balance-hero{
+  background: var(--card);
+  border: 1px solid var(--paper-line);
+  border-left: 4px solid var(--ledger-red);
+  border-radius: var(--radius);
+  padding: 20px 18px;
+  margin: 14px 0;
+  box-shadow: var(--shadow);
+}
+.balance-hero .label{
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  font-weight: 600;
+  letter-spacing:.3px;
+}
+.balance-hero .amount{
+  font-family: var(--font-mono);
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--ink-blue);
+  margin-top: 4px;
+  line-height:1.2;
+}
+.balance-hero .amount.neg{ color: var(--ledger-red); }
+
+.stat-row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 12px 0;
+}
+.stat-card{
+  background: var(--card);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  padding: 13px 14px;
+  box-shadow: var(--shadow);
+}
+.stat-card .label{
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.stat-card .value{
+  font-family: var(--font-mono);
+  font-size: 19px;
+  font-weight: 600;
+  margin-top: 3px;
+  color: var(--ink);
+}
+.stat-card.due .value{ color: var(--ledger-red); }
+.stat-card.profit .value{ color: var(--profit-green); }
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:6px;
+  border:none; border-radius: 8px;
+  padding: 12px 16px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14.5px;
+  cursor:pointer;
+  width: 100%;
+}
+.btn-primary{ background: var(--ledger-red); color: #fff; }
+.btn-primary:active{ background:#87182a; }
+.btn-secondary{ background: var(--ink-blue); color:#fff; }
+.btn-outline{
+  background: transparent;
+  border: 1.5px solid var(--paper-line);
+  color: var(--ink);
+}
+.btn-ghost{
+  background: transparent; color: var(--ink-blue);
+  padding: 8px 4px; width:auto; font-size:13.5px;
+}
+.btn-row{ display:flex; gap:10px; margin: 14px 0; }
+.btn-row .btn{ flex:1; }
+
+/* ---------- Section heading ---------- */
+.section-head{
+  display:flex; align-items:center; justify-content:space-between;
+  margin: 22px 0 10px;
+}
+.section-head h2{
+  font-family: var(--font-display);
+  font-size: 17px;
+  margin:0;
+  color: var(--ink);
+}
+
+/* ---------- List items (folders, transactions, loans) ---------- */
+.list{ display:flex; flex-direction:column; gap:9px; }
+.list-item{
+  background: var(--card);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  padding: 13px 14px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap: 10px;
+  box-shadow: var(--shadow);
+}
+.list-item .name{ font-weight:600; font-size:15px; }
+.list-item .sub{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+.list-item .right{ text-align:right; }
+.list-item .amount{ font-family: var(--font-mono); font-weight:600; font-size:15.5px; }
+.amount.pos{ color: var(--profit-green); }
+.amount.neg{ color: var(--ledger-red); }
+.amount.pending{ color: var(--brass); }
+
+.badge{
+  display:inline-block;
+  font-size: 10.5px;
+  font-weight:700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing:.3px;
+}
+.badge.paid{ background: rgba(63,108,81,.15); color: var(--profit-green); }
+.badge.unpaid{ background: rgba(168,130,60,.18); color: var(--brass); }
+
+.empty{
+  text-align:center;
+  padding: 40px 20px;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+.empty .glyph{ font-size:28px; display:block; margin-bottom:8px; }
+
+/* ---------- Forms / modals ---------- */
+.field{ margin-bottom: 14px; }
+.field label{
+  display:block; font-size:12.5px; font-weight:600;
+  color: var(--ink-soft); margin-bottom:5px;
+}
+.field input, .field select, .field textarea{
+  width:100%;
+  padding: 11px 12px;
+  border: 1.5px solid var(--paper-line);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  background: #fff;
+  color: var(--ink);
+}
+.field input:focus, .field select:focus, .field textarea:focus{
+  outline: 2px solid var(--ink-blue);
+  outline-offset: 1px;
+}
+.field.mono input{ font-family: var(--font-mono); }
+
+.sheet-overlay{
+  position: fixed; inset:0;
+  background: rgba(35,36,31,.45);
+  z-index: 50;
+  display:none;
+  align-items: flex-end;
+}
+.sheet-overlay.open{ display:flex; }
+.sheet{
+  background: var(--paper);
+  width:100%;
+  max-width: 480px;
+  margin: 0 auto;
+  border-radius: 16px 16px 0 0;
+  padding: 20px 18px 26px;
+  max-height: 88vh;
+  overflow-y:auto;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.2);
+}
+.sheet h3{
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin: 0 0 16px;
+  color: var(--ledger-red);
+}
+.sheet .close-x{
+  position:absolute; top:16px; right:18px;
+  font-size:20px; color:var(--ink-soft); background:none; border:none;
+}
+
+/* ---------- Item row (category calc) ---------- */
+.item-card{
+  background: var(--card);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+}
+.item-card .item-top{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  margin-bottom: 10px;
+}
+.item-card .cat-name{ font-weight:700; font-size:15px; }
+.calc-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.calc-grid .k{ color: var(--ink-soft); }
+.calc-grid .v{ text-align:right; font-weight:600; }
+.divider{ border-top: 1px dashed var(--paper-line); margin: 10px 0; }
+.profit-line{
+  display:flex; justify-content:space-between; align-items:center;
+  font-weight:700;
+}
+.profit-line .v{ font-family: var(--font-mono); color: var(--profit-green); font-size:16px; }
+
+.item-actions{ display:flex; gap:8px; margin-top:12px; }
+.item-actions .btn{ padding: 9px 10px; font-size:13px; }
+
+/* ---------- FAB ---------- */
+.fab{
+  position: fixed;
+  bottom: 22px; right: 20px;
+  width: 56px; height:56px;
+  border-radius: 50%;
+  background: var(--ledger-red);
+  color:#fff;
+  border:none;
+  font-size: 26px;
+  box-shadow: 0 4px 14px rgba(160,35,52,.4);
+  z-index: 30;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* ---------- Bottom tab bar ---------- */
+.tabbar{
+  position: fixed; bottom:0; left:0; right:0;
+  background: var(--card);
+  border-top: 1px solid var(--paper-line);
+  display:flex;
+  z-index: 25;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tabbar a{
+  flex:1; text-align:center; padding: 9px 0 8px;
+  font-size: 11px; color: var(--ink-soft); font-weight:600;
+}
+.tabbar a .ic{ display:block; font-size:19px; margin-bottom:2px; }
+.tabbar a.active{ color: var(--ledger-red); }
+
+/* ---------- Misc ---------- */
+.taka::before{ content:"৳ "; }
+.muted{ color: var(--ink-soft); }
+.center{ text-align:center; }
+.hidden{ display:none !important; }
+.toast{
+  position: fixed; top: 14px; left:50%; transform:translateX(-50%);
+  background: var(--ink); color:#fff;
+  padding: 10px 18px; border-radius: 8px;
+  font-size: 13.5px; z-index: 100;
+  opacity:0; pointer-events:none;
+  transition: opacity .25s ease;
+}
+.toast.show{ opacity:1; }
+
+.login-wrap{
+  min-height: 100vh; display:flex; align-items:center; justify-content:center;
+  padding: 20px 26px;
+}
+.login-card{
+  background: var(--card);
+  border: 1px solid var(--paper-line);
+  border-left: 4px solid var(--ledger-red);
+  border-radius: var(--radius);
+  padding: 28px 22px;
+  width:100%; max-width: 360px;
+  box-shadow: var(--shadow);
+}
+.login-card h1{
+  font-family: var(--font-display);
+  color: var(--ledger-red);
+  font-size: 24px; margin: 0 0 4px;
+}
+.login-card p.sub{ color:var(--ink-soft); font-size:13px; margin:0 0 20px; }
+.error-text{ color: var(--ledger-red); font-size:13px; margin-top:8px; min-height:16px; }
+
+@media (min-width: 500px){
+  :root{ --margin-rule: 56px; }
+}
