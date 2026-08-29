@@ -24,21 +24,31 @@ requireAuth((user) => {
 
 document.getElementById("logoutBtn").addEventListener("click", logout);
 
-// ---------- Due = unpaid item profit (all folders) + unpaid loans ----------
+// ---------- Due = unpaid/partially-paid item profit (all folders) + unpaid/partial loans ----------
 function watchDue(){
   let itemsDue = 0, loansDue = 0;
 
   const itemsQ = query(collectionGroup(db, "items"), where("ownerUid", "==", auth.currentUser.uid), where("paid", "==", false));
   onSnapshot(itemsQ, (snap) => {
     itemsDue = 0;
-    snap.forEach(d => { itemsDue += Number(d.data().profit) || 0; });
+    snap.forEach(d => {
+      const it = d.data();
+      const profit = Number(it.profit) || 0;
+      const paidAmount = it.paidAmount !== undefined ? Number(it.paidAmount) : 0;
+      itemsDue += Math.max(profit - paidAmount, 0);
+    });
     updateDue(itemsDue, loansDue);
   });
 
   const loansQ = query(collection(db, "users", auth.currentUser.uid, "loans"), where("paid", "==", false));
   onSnapshot(loansQ, (snap) => {
     loansDue = 0;
-    snap.forEach(d => { loansDue += Number(d.data().amount) || 0; });
+    snap.forEach(d => {
+      const ln = d.data();
+      const amount = Number(ln.amount) || 0;
+      const paidAmount = ln.paidAmount !== undefined ? Number(ln.paidAmount) : 0;
+      loansDue += Math.max(amount - paidAmount, 0);
+    });
     updateDue(itemsDue, loansDue);
   });
 }
