@@ -27,6 +27,19 @@ requireAuth(async (user) => {
   }
   document.getElementById("folderName").textContent = fSnap.data().name;
 
+  document.getElementById("renameFolderBtn").addEventListener("click", async () => {
+    const current = document.getElementById("folderName").textContent;
+    const newName = prompt("কাস্টমারের নতুন নাম লিখুন:", current);
+    if (newName === null) return;
+    if (!newName.trim()){
+      toast("নাম খালি রাখা যাবে না");
+      return;
+    }
+    await updateDoc(userDoc(uid, "customers", folderId), { name: newName.trim() });
+    document.getElementById("folderName").textContent = newName.trim();
+    toast("নাম বদলানো হয়েছে");
+  });
+
   watchCategories(uid, populateCategorySelect);
 
   const q = query(collection(db, "users", uid, "customers", folderId, "items"), orderBy("createdAt", "desc"));
@@ -37,7 +50,6 @@ requireAuth(async (user) => {
   });
 });
 
-// ---------- Category select ----------
 function populateCategorySelect(cats){
   const sel = document.getElementById("catSelect");
   const current = sel.value;
@@ -50,7 +62,6 @@ document.getElementById("catSelect").addEventListener("change", (e) => {
   document.getElementById("newCatField").classList.toggle("hidden", e.target.value !== "__new__");
 });
 
-// ---------- Render items ----------
 function renderItems(rows){
   let totalProfit = 0, unpaid = 0;
   const list = document.getElementById("itemList");
@@ -63,13 +74,25 @@ function renderItems(rows){
   }
 
   list.innerHTML = rows.map(it => {
-    totalProfit += Number(it.profit) || 0;
-    if (!it.paid) unpaid += Number(it.profit) || 0;
+    const profit = Number(it.profit) || 0;
+    const paidAmount = it.paidAmount !== undefined ? Number(it.paidAmount) : (it.paid ? profit : 0);
+    const remaining = Math.max(profit - paidAmount, 0);
+    const isFull = paidAmount >= profit && profit > 0;
+    const isPartial = paidAmount > 0 && !isFull;
+
+    totalProfit += profit;
+    if (!isFull) unpaid += remaining;
+
+    let badge;
+    if (isFull) badge = `<span class="badge paid">পরিশোধিত</span>`;
+    else if (isPartial) badge = `<span class="badge partial">আংশিক ৳${fmtTaka(paidAmount)}</span>`;
+    else badge = `<span class="badge unpaid">বকেয়া</span>`;
+
     return `
       <div class="item-card">
         <div class="item-top">
           <div class="cat-name">${escapeAttr(it.category)}</div>
-          <span class="badge ${it.paid ? "paid" : "unpaid"}">${it.paid ? "পরিশোধিত" : "বকেয়া"}</span>
+          ${badge}
         </div>
         <div class="calc-grid">
           <div class="k">পরিমাণ</div><div class="v">${it.quantity} পিছ</div>
@@ -81,14 +104,18 @@ function renderItems(rows){
         <div class="divider"></div>
         <div class="profit-line">
           <span>লাভ</span>
-          <span class="v taka">${fmtTaka(it.profit)}</span>
+          <span class="v taka">${fmtTaka(profit)}</span>
         </div>
-        <div class="item-actions">
-          ${it.paid
-            ? `<button class="btn btn-outline undo-btn" data-id="${it.id}" data-profit="${it.profit}">পরিশোধ বাতিল করুন</button>`
-            : `<button class="btn btn-primary pay-btn" data-id="${it.id}" data-profit="${it.profit}" data-cat="${escapeAttr(it.category)}">পরিশোধ — ব্যালেন্সে যোগ করুন</button>`
+        ${isPartial ? `<div class="sub" style="margin-top:4px">বকেয়া রয়েছে ৳${fmtTaka(remaining)}</div>` : ""}
+        <div class="item-actions" style="flex-wrap:wrap">
+          ${isFull
+            ? `<button class="btn btn-outline undo-btn" data-id="${it.id}" data-paidamount="${paidAmount}">পরিশোধ বাতিল করুন</button>`
+            : `
+              <button class="btn btn-primary pay-btn" data-id="${it.id}" data-profit="${profit}" data-paidamount="${paidAmount}" data-cat="${escapeAttr(it.category)}">সম্পূর্ণ পরিশোধ</button>
+              <button class="btn btn-secondary partial-btn" data-id="${it.id}" data-profit="${profit}" data-paidamount="${paidAmount}" data-cat="${escapeAttr(it.category)}">আংশিক পরিশোধ</button>
+            `
           }
-          <button class="btn btn-outline del-btn" data-id="${it.id}" style="flex:0 0 44px">🗑</button>
+          <button class="btn btn-outline del-btn" data-id="${it.id}" data-paidamount="${paidAmount}" style="flex:0 0 44px">🗑</button>
         </div>
       </div>`;
   }).join("");
@@ -97,31 +124,70 @@ function renderItems(rows){
   document.getElementById("folderUnpaid").textContent = fmtTaka(unpaid);
 
   list.querySelectorAll(".pay-btn").forEach(btn => btn.addEventListener("click", onPay));
+  list.querySelectorAll(".partial-btn").forEach(btn => btn.addEventListener("click", onPartialPay));
   list.querySelectorAll(".undo-btn").forEach(btn => btn.addEventListener("click", onUndo));
   list.querySelectorAll(".del-btn").forEach(btn => btn.addEventListener("click", onDelete));
 }
 
 async function onPay(e){
-  const id = e.target.dataset.id;
-  const profit = Number(e.target.dataset.profit);
-  const cat = e.target.dataset.cat;
+  const id = e.currentTarget.dataset.id;
+  const profit = Number(e.currentTarget.dataset.profit);
+  const paidAmount = Number(e.currentTarget.dataset.paidamount) || 0;
+  const cat = e.currentTarget.dataset.cat;
+  const remaining = profit - paidAmount;
   const folderName = document.getElementById("folderName").textContent;
-  await updateDoc(userDoc(uid, "customers", folderId, "items", id), { paid: true, paidAt: serverTimestamp() });
-  await applyBalanceChange(uid, profit, "profit", `${folderName} — ${cat}`, `customers/${folderId}/items/${id}`);
+  await updateDoc(userDoc(uid, "customers", folderId, "items", id), { paidAmount: profit, paid: true, paidAt: serverTimestamp() });
+  await applyBalanceChange(uid, remaining, "profit", `${folderName} — ${cat}`, `customers/${folderId}/items/${id}`);
   toast("লাভ মূল ব্যালেন্সে যোগ হয়েছে");
 }
 
+async function onPartialPay(e){
+  const id = e.currentTarget.dataset.id;
+  const profit = Number(e.currentTarget.dataset.profit);
+  const paidAmount = Number(e.currentTarget.dataset.paidamount) || 0;
+  const cat = e.currentTarget.dataset.cat;
+  const remaining = profit - paidAmount;
+  const folderName = document.getElementById("folderName").textContent;
+
+  const input = prompt(
+    `${cat} — মোট লাভ ৳${fmtTaka(profit)}, এখনো বকেয়া ৳${fmtTaka(remaining)}।\nকাস্টমার কত টাকা এখন পরিশোধ করলো?`,
+    ""
+  );
+  if (input === null) return;
+  const paidNow = parseFloat(input);
+  if (!paidNow || paidNow <= 0){
+    toast("সঠিক পরিমাণ দিন");
+    return;
+  }
+  const cappedPaidNow = Math.min(paidNow, remaining);
+  const newPaidAmount = paidAmount + cappedPaidNow;
+  const isFullyPaid = newPaidAmount >= profit;
+
+  await updateDoc(userDoc(uid, "customers", folderId, "items", id), {
+    paidAmount: newPaidAmount,
+    paid: isFullyPaid,
+    paidAt: isFullyPaid ? serverTimestamp() : null
+  });
+  await applyBalanceChange(uid, cappedPaidNow, "profit", `${folderName} — ${cat} (আংশিক ৳${fmtTaka(cappedPaidNow)})`, `customers/${folderId}/items/${id}`);
+  toast(isFullyPaid ? "সম্পূর্ণ পরিশোধ হয়ে গেছে" : "আংশিক পরিশোধ ব্যালেন্সে যোগ হয়েছে");
+}
+
 async function onUndo(e){
-  const id = e.target.dataset.id;
-  const profit = Number(e.target.dataset.profit);
-  await updateDoc(userDoc(uid, "customers", folderId, "items", id), { paid: false, paidAt: null });
-  await applyBalanceChange(uid, -profit, "profit", "পরিশোধ বাতিল");
+  const id = e.currentTarget.dataset.id;
+  const paidAmount = Number(e.currentTarget.dataset.paidamount) || 0;
+  await updateDoc(userDoc(uid, "customers", folderId, "items", id), { paidAmount: 0, paid: false, paidAt: null });
+  await applyBalanceChange(uid, -paidAmount, "profit", "পরিশোধ বাতিল");
   toast("পরিশোধ বাতিল হয়েছে");
 }
 
 async function onDelete(e){
-  const id = e.target.dataset.id;
-  if (!confirm("এই প্রোডাক্টটি মুছে ফেলবেন?")) return;
+  const id = e.currentTarget.dataset.id;
+  const paidAmount = Number(e.currentTarget.dataset.paidamount) || 0;
+  const warn = paidAmount > 0 ? ` এর পরিশোধিত ৳${fmtTaka(paidAmount)} মূল ব্যালেন্স থেকেও বাদ যাবে।` : "";
+  if (!confirm("এই প্রোডাক্টটি মুছে ফেলবেন?" + warn)) return;
+  if (paidAmount > 0){
+    await applyBalanceChange(uid, -paidAmount, "adjustment", "প্রোডাক্ট মুছে ফেলায় সমন্বয়");
+  }
   await deleteDoc(userDoc(uid, "customers", folderId, "items", id));
   toast("মুছে ফেলা হয়েছে");
 }
@@ -132,7 +198,6 @@ function escapeAttr(s){
   return d.innerHTML;
 }
 
-// ---------- New item sheet ----------
 const overlay = document.getElementById("itemOverlay");
 document.getElementById("openNewItem").addEventListener("click", () => overlay.classList.add("open"));
 document.getElementById("closeItem").addEventListener("click", () => overlay.classList.remove("open"));
@@ -175,7 +240,7 @@ document.getElementById("saveItem").addEventListener("click", async () => {
 
   await addDoc(userCol(uid, "customers", folderId, "items"), {
     category: categoryName, quantity: qty, costRate, saleRate,
-    costTotal, saleTotal, profit, paid: false,
+    costTotal, saleTotal, profit, paidAmount: 0, paid: false,
     ownerUid: uid, createdAt: serverTimestamp()
   });
 
