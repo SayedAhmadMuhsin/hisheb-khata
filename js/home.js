@@ -1,10 +1,11 @@
 import { auth, db } from "./firebase-config.js";
 import {
   requireAuth, logout, fmtTaka, toast, watchBalance,
-  applyBalanceChange, watchRecentTransactions, fmtDate
+  applyBalanceChange, watchRecentTransactions, fmtDate, userDoc
 } from "./app.js";
 import {
-  collectionGroup, collection, query, where, onSnapshot
+  collectionGroup, collection, query, where, onSnapshot,
+  updateDoc, deleteDoc, increment
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 let uid;
@@ -79,7 +80,7 @@ function renderTx(rows){
     list.innerHTML = `<div class="empty"><span class="glyph">📖</span>এখনও কোনো লেনদেন নেই</div>`;
     return;
   }
-  const labels = { profit: "লাভ জমা", withdraw: "উত্তোলন", loan_add: "ঋণ যোগ", loan_paid: "ঋণ পরিশোধ" };
+  const labels = { profit: "লাভ জমা", withdraw: "উত্তোলন", loan_add: "ঋণ যোগ", loan_paid: "ঋণ পরিশোধ", adjustment: "সমন্বয়" };
   list.innerHTML = rows.map(r => {
     const isNeg = r.amount < 0;
     return `
@@ -88,11 +89,21 @@ function renderTx(rows){
           <div class="name">${labels[r.type] || r.type}</div>
           <div class="sub">${r.note ? r.note + " · " : ""}${fmtDate(r.createdAt)}</div>
         </div>
-        <div class="right">
+        <div class="right" style="display:flex; align-items:center; gap:10px">
           <div class="amount ${isNeg ? "neg" : "pos"} taka">${isNeg ? "-" : "+"}${fmtTaka(Math.abs(r.amount))}</div>
+          <button class="btn-ghost del-tx" data-id="${r.id}" data-amount="${r.amount}" style="padding:2px 6px; font-size:16px">🗑</button>
         </div>
       </div>`;
   }).join("");
+
+  list.querySelectorAll(".del-tx").forEach(b => b.addEventListener("click", async (e) => {
+    const id = e.currentTarget.dataset.id;
+    const amount = Number(e.currentTarget.dataset.amount);
+    if (!confirm("এই এন্ট্রিটা মুছে ফেলবেন?\nএর প্রভাব মূল ব্যালেন্স থেকেও বাদ যাবে।\n\n(খেয়াল রাখবেন: এটা শুধু এই লগ এন্ট্রি মুছবে, সংশ্লিষ্ট ফোল্ডার/ঋণের এন্ট্রির \"পরিশোধিত\" অবস্থা বদলাবে না — সেটা ওই পেজে গিয়ে আলাদাভাবে ঠিক করতে হবে।)")) return;
+    await updateDoc(userDoc(uid, "meta", "balance"), { mainBalance: increment(-amount) });
+    await deleteDoc(userDoc(uid, "transactions", id));
+    toast("মুছে ফেলা হয়েছে");
+  }));
 }
 
 // ---------- Withdraw sheet ----------
