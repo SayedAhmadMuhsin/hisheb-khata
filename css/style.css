@@ -226,6 +226,7 @@ button{ font-family: inherit; }
 }
 .badge.paid{ background: rgba(63,108,81,.15); color: var(--profit-green); }
 .badge.unpaid{ background: rgba(168,130,60,.18); color: var(--brass); }
+.badge.partial{ background: rgba(43,58,85,.15); color: var(--ink-blue); }
 
 .empty{
   text-align:center;
