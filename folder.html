@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>ফোল্ডার — হিসাব খাতা</title>
-<link rel="stylesheet" href="css/style.css?v=2">
+<link rel="stylesheet" href="css/style.css?v=3">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -84,4 +84,22 @@
       <div class="k">লাভ</div><div class="v taka" id="previewProfit" style="color:var(--profit-green)">০</div>
     </div>
 
-    <button class=
+    <button class="btn btn-primary" id="saveItem">যোগ করুন</button>
+  </div>
+</div>
+
+<!-- Category manager sheet -->
+<div class="sheet-overlay" id="catManagerOverlay">
+  <div class="sheet">
+    <button class="close-x" id="closeCatManager">✕</button>
+    <h3>ক্যাটেগরি ম্যানেজ করুন</h3>
+    <p class="muted" style="font-size:12.5px; margin-top:-10px; margin-bottom:14px">
+      এখান থেকে মুছলে শুধু ভবিষ্যতের নতুন প্রোডাক্টের তালিকা থেকে বাদ যাবে — আগের কোনো প্রোডাক্ট মুছবে না।
+    </p>
+    <div class="list" id="catManageList"></div>
+  </div>
+</div>
+
+<script type="module" src="js/folder.js?v=3"></script>
+</body>
+</html>
