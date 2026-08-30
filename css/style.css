@@ -181,6 +181,7 @@ button{ font-family: inherit; }
 .btn-ghost{
   background: transparent; color: var(--ink-blue);
   padding: 8px 4px; width:auto; font-size:13.5px;
+  border: none;
 }
 .btn-row{ display:flex; gap:10px; margin: 14px 0; }
 .btn-row .btn{ flex:1; }
