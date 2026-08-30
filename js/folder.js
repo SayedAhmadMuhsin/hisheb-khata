@@ -27,7 +27,8 @@ requireAuth(async (user) => {
   }
   document.getElementById("folderName").textContent = fSnap.data().name;
 
-  document.getElementById("renameFolderBtn").addEventListener("click", async () => {
+  const renameBtn = document.getElementById("renameFolderBtn");
+  if (renameBtn) renameBtn.addEventListener("click", async () => {
     const current = document.getElementById("folderName").textContent;
     const newName = prompt("কাস্টমারের নতুন নাম লিখুন:", current);
     if (newName === null) return;
@@ -41,8 +42,10 @@ requireAuth(async (user) => {
   });
 
   const catOverlay = document.getElementById("catManagerOverlay");
-  document.getElementById("openCatManager").addEventListener("click", () => catOverlay.classList.add("open"));
-  document.getElementById("closeCatManager").addEventListener("click", () => catOverlay.classList.remove("open"));
+  const openCatBtn = document.getElementById("openCatManager");
+  const closeCatBtn = document.getElementById("closeCatManager");
+  if (catOverlay && openCatBtn) openCatBtn.addEventListener("click", () => catOverlay.classList.add("open"));
+  if (catOverlay && closeCatBtn) closeCatBtn.addEventListener("click", () => catOverlay.classList.remove("open"));
 
   watchCategories(uid, (cats) => {
     populateCategorySelect(cats);
@@ -60,14 +63,16 @@ requireAuth(async (user) => {
 // ---------- Category select ----------
 function populateCategorySelect(cats){
   const sel = document.getElementById("catSelect");
+  if (!sel) return;
   const current = sel.value;
   sel.innerHTML = cats.map(c => `<option value="${c.id}" data-name="${escapeAttr(c.name)}">${escapeAttr(c.name)}</option>`).join("")
     + `<option value="__new__">+ নতুন ক্যাটেগরি যোগ করুন</option>`;
   if ([...sel.options].some(o => o.value === current)) sel.value = current;
-  document.getElementById("newCatField").classList.toggle("hidden", sel.value !== "__new__");
+  const newCatField = document.getElementById("newCatField");
+  if (newCatField) newCatField.classList.toggle("hidden", sel.value !== "__new__");
 }
-document.getElementById("catSelect").addEventListener("change", (e) => {
-  document.getElementById("newCatField").classList.toggle("hidden", e.target.value !== "__new__");
+document.getElementById("catSelect")?.addEventListener("change", (e) => {
+  document.getElementById("newCatField")?.classList.toggle("hidden", e.target.value !== "__new__");
 });
 
 // ---------- Category manager (edit/delete) ----------
@@ -289,11 +294,11 @@ function escapeAttr(s){
 
 // ---------- New item sheet ----------
 const overlay = document.getElementById("itemOverlay");
-document.getElementById("openNewItem").addEventListener("click", () => overlay.classList.add("open"));
-document.getElementById("closeItem").addEventListener("click", () => overlay.classList.remove("open"));
+document.getElementById("openNewItem")?.addEventListener("click", () => overlay.classList.add("open"));
+document.getElementById("closeItem")?.addEventListener("click", () => overlay.classList.remove("open"));
 
 ["iQty", "iCostRate", "iSaleRate"].forEach(id => {
-  document.getElementById(id).addEventListener("input", updatePreview);
+  document.getElementById(id)?.addEventListener("input", updatePreview);
 });
 function updatePreview(){
   const qty = parseFloat(document.getElementById("iQty").value) || 0;
@@ -306,7 +311,7 @@ function updatePreview(){
   document.getElementById("previewProfit").textContent = fmtTaka(sale - cost);
 }
 
-document.getElementById("saveItem").addEventListener("click", async () => {
+document.getElementById("saveItem")?.addEventListener("click", async () => {
   const sel = document.getElementById("catSelect");
   let categoryName;
   if (sel.value === "__new__"){
