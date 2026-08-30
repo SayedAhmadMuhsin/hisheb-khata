@@ -50,6 +50,7 @@ requireAuth(async (user) => {
   });
 });
 
+// ---------- Category select ----------
 function populateCategorySelect(cats){
   const sel = document.getElementById("catSelect");
   const current = sel.value;
@@ -62,6 +63,7 @@ document.getElementById("catSelect").addEventListener("change", (e) => {
   document.getElementById("newCatField").classList.toggle("hidden", e.target.value !== "__new__");
 });
 
+// ---------- Render items ----------
 function renderItems(rows){
   let totalProfit = 0, unpaid = 0;
   const list = document.getElementById("itemList");
@@ -115,6 +117,7 @@ function renderItems(rows){
               <button class="btn btn-secondary partial-btn" data-id="${it.id}" data-profit="${profit}" data-paidamount="${paidAmount}" data-cat="${escapeAttr(it.category)}">আংশিক পরিশোধ</button>
             `
           }
+          <button class="btn btn-outline edit-btn" data-id="${it.id}" data-cat="${escapeAttr(it.category)}" data-qty="${it.quantity}" data-costrate="${it.costRate}" data-salerate="${it.saleRate}" style="flex:0 0 44px">✏️</button>
           <button class="btn btn-outline del-btn" data-id="${it.id}" data-paidamount="${paidAmount}" style="flex:0 0 44px">🗑</button>
         </div>
       </div>`;
@@ -126,6 +129,7 @@ function renderItems(rows){
   list.querySelectorAll(".pay-btn").forEach(btn => btn.addEventListener("click", onPay));
   list.querySelectorAll(".partial-btn").forEach(btn => btn.addEventListener("click", onPartialPay));
   list.querySelectorAll(".undo-btn").forEach(btn => btn.addEventListener("click", onUndo));
+  list.querySelectorAll(".edit-btn").forEach(btn => btn.addEventListener("click", onEditItem));
   list.querySelectorAll(".del-btn").forEach(btn => btn.addEventListener("click", onDelete));
 }
 
@@ -180,6 +184,41 @@ async function onUndo(e){
   toast("পরিশোধ বাতিল হয়েছে");
 }
 
+async function onEditItem(e){
+  const id = e.currentTarget.dataset.id;
+  const currentCat = e.currentTarget.dataset.cat;
+  const currentQty = e.currentTarget.dataset.qty;
+  const currentCostRate = e.currentTarget.dataset.costrate;
+  const currentSaleRate = e.currentTarget.dataset.salerate;
+
+  const newCat = prompt("ক্যাটেগরির নাম:", currentCat);
+  if (newCat === null) return;
+  const newQtyStr = prompt("পরিমাণ (পিছ):", currentQty);
+  if (newQtyStr === null) return;
+  const newCostRateStr = prompt("মূল রেট (প্রতি পিছ খরচ, ৳):", currentCostRate);
+  if (newCostRateStr === null) return;
+  const newSaleRateStr = prompt("কাস্টমার রেট (প্রতি পিছ, ৳):", currentSaleRate);
+  if (newSaleRateStr === null) return;
+
+  const newQty = parseFloat(newQtyStr);
+  const newCostRate = parseFloat(newCostRateStr);
+  const newSaleRate = parseFloat(newSaleRateStr);
+  if (!newCat.trim() || !newQty || newQty <= 0 || isNaN(newCostRate) || isNaN(newSaleRate)){
+    toast("সঠিক তথ্য দিন");
+    return;
+  }
+
+  const newCostTotal = newQty * newCostRate;
+  const newSaleTotal = newQty * newSaleRate;
+  const newProfit = newSaleTotal - newCostTotal;
+
+  await updateDoc(userDoc(uid, "customers", folderId, "items", id), {
+    category: newCat.trim(), quantity: newQty, costRate: newCostRate, saleRate: newSaleRate,
+    costTotal: newCostTotal, saleTotal: newSaleTotal, profit: newProfit
+  });
+  toast("আপডেট হয়েছে");
+}
+
 async function onDelete(e){
   const id = e.currentTarget.dataset.id;
   const paidAmount = Number(e.currentTarget.dataset.paidamount) || 0;
@@ -198,6 +237,7 @@ function escapeAttr(s){
   return d.innerHTML;
 }
 
+// ---------- New item sheet ----------
 const overlay = document.getElementById("itemOverlay");
 document.getElementById("openNewItem").addEventListener("click", () => overlay.classList.add("open"));
 document.getElementById("closeItem").addEventListener("click", () => overlay.classList.remove("open"));
