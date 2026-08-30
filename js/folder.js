@@ -40,7 +40,14 @@ requireAuth(async (user) => {
     toast("নাম বদলানো হয়েছে");
   });
 
-  watchCategories(uid, populateCategorySelect);
+  const catOverlay = document.getElementById("catManagerOverlay");
+  document.getElementById("openCatManager").addEventListener("click", () => catOverlay.classList.add("open"));
+  document.getElementById("closeCatManager").addEventListener("click", () => catOverlay.classList.remove("open"));
+
+  watchCategories(uid, (cats) => {
+    populateCategorySelect(cats);
+    renderCategoryManager(cats);
+  });
 
   const q = query(collection(db, "users", uid, "customers", folderId, "items"), orderBy("createdAt", "desc"));
   onSnapshot(q, (snap) => {
@@ -62,6 +69,49 @@ function populateCategorySelect(cats){
 document.getElementById("catSelect").addEventListener("change", (e) => {
   document.getElementById("newCatField").classList.toggle("hidden", e.target.value !== "__new__");
 });
+
+// ---------- Category manager (edit/delete) ----------
+function renderCategoryManager(cats){
+  const list = document.getElementById("catManageList");
+  if (!list) return;
+  if (!cats.length){
+    list.innerHTML = `<div class="empty">কোনো ক্যাটেগরি নেই</div>`;
+    return;
+  }
+  list.innerHTML = cats.map(c => `
+    <div class="list-item">
+      <div class="name">${escapeAttr(c.name)}</div>
+      <div style="display:flex; gap:10px">
+        <button class="btn-ghost edit-cat" data-id="${c.id}" data-name="${escapeAttr(c.name)}" style="font-size:17px; padding:2px 6px">✏️</button>
+        <button class="btn-ghost del-cat" data-id="${c.id}" data-name="${escapeAttr(c.name)}" style="font-size:17px; padding:2px 6px">🗑</button>
+      </div>
+    </div>
+  `).join("");
+
+  list.querySelectorAll(".edit-cat").forEach(b => b.addEventListener("click", onEditCategory));
+  list.querySelectorAll(".del-cat").forEach(b => b.addEventListener("click", onDeleteCategory));
+}
+
+async function onEditCategory(e){
+  const id = e.currentTarget.dataset.id;
+  const currentName = e.currentTarget.dataset.name;
+  const newName = prompt("ক্যাটেগরির নতুন নাম লিখুন:", currentName);
+  if (newName === null) return;
+  if (!newName.trim()){
+    toast("নাম খালি রাখা যাবে না");
+    return;
+  }
+  await updateDoc(userDoc(uid, "categories", id), { name: newName.trim() });
+  toast("ক্যাটেগরি আপডেট হয়েছে");
+}
+
+async function onDeleteCategory(e){
+  const id = e.currentTarget.dataset.id;
+  const name = e.currentTarget.dataset.name;
+  if (!confirm(`"${name}" ক্যাটেগরিটা মুছে ফেলবেন?\nএটা শুধু ভবিষ্যতের তালিকা থেকে বাদ যাবে, আগে এই ক্যাটেগরিতে যোগ করা প্রোডাক্ট মুছবে না।`)) return;
+  await deleteDoc(userDoc(uid, "categories", id));
+  toast("ক্যাটেগরি মুছে ফেলা হয়েছে");
+}
 
 // ---------- Render items ----------
 function renderItems(rows){
